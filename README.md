@@ -93,15 +93,31 @@ curl -i -X PUT -H  "Content-Type:application/json"     http://localhost:8083/con
     "key.converter.schemas.enable": "false",
     "value.converter": "io.confluent.connect.avro.AvroConverter",
     "value.converter.schema.registry.url": "http://schema-registry:8081",
+
     "oracle.server": "oracle-free",
     "oracle.port": "1521",
     "oracle.sid": "FREE",
     "oracle.pdb.name": "FREEPDB1",
     "oracle.username": "SYSTEM",
     "oracle.password": "mypassword",
+
+    "predicates": "IsTableTopic",
+    "predicates.IsTableTopic.type": "org.apache.kafka.connect.transforms.predicates.TopicNameMatches",
+    "predicates.IsTableTopic.pattern": "^cdc$",
+
+    "transforms": "filterByAddress",
+    "transforms.filterByAddress.type": "io.confluent.connect.transforms.Filter$Value",
+    "transforms.filterByAddress.filter.condition": "$[?(@.DELIVERY_ADDRESS =~ /.*plaza.*/i)]",
+    "transforms.filterByAddress.filter.type": "include",
+    "transforms.filterByAddress.missing.or.null.behavior": "exclude",
+    "transforms.filterByAddress.predicate": "IsTableTopic",
+
     "redo.log.consumer.bootstrap.servers": "broker:29092",
+    "redo.log.topic.name": "redo",
+
     "table.inclusion.regex": "FREEPDB1[.]SYSTEM[.]ORDERS.*",
     "table.topic.name.template": "cdc",
+
     "numeric.mapping": "precision_only",
     "numeric.default.scale": "0"
   }'
